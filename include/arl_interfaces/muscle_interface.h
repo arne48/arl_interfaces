@@ -2,7 +2,7 @@
 #define ARL_INTERFACES_MUSCLE_INTERFACE_H
 
 #include <hardware_interface/internal/hardware_resource_manager.h>
-#include <vector>
+#include <cassert>
 #include <string>
 
 namespace arl_interfaces {
@@ -10,51 +10,48 @@ namespace arl_interfaces {
   class MuscleHandle {
 
   public:
-    MuscleHandle() : names_(), desired_pressures_(), current_pressures_(), tensions_() {}
+    MuscleHandle() : name_(), desired_pressure_(), current_pressure_(), tension_() {}
 
-    MuscleHandle(const std::vector <std::string> &names, std::vector<double> &desired_pressures, std::vector<double> &current_pressures,
-                    std::vector<double> &tensions) : names_(names), desired_pressures_(desired_pressures),
-                                                     current_pressures_(current_pressures), tensions_(tensions) {
-      /*if (!names)
+    MuscleHandle(const std::string &name, double* desired_pressure, double* current_pressure, double* tension)
+      : name_(name), desired_pressure_(desired_pressure), current_pressure_(current_pressure), tension_(tension) {
+
+      if (!desired_pressure)
       {
-        throw HardwareInterfaceException("Cannot create handle for muscle names");
+        throw hardware_interface::HardwareInterfaceException("Cannot create handle for desired pressures of muscle " + name);
       }
-      if (!desired_pressures)
+      if (!current_pressure)
       {
-        throw HardwareInterfaceException("Cannot create handle for desired pressures");
+        throw hardware_interface::HardwareInterfaceException("Cannot create handle for current pressures of muscle " + name);
       }
-      if (!current_pressures)
+      if (!tension)
       {
-        throw HardwareInterfaceException("Cannot create handle for current pressures");
+        throw hardware_interface::HardwareInterfaceException("Cannot create handle for tensions of muscle " + name);
       }
-      if (!tensions)
-      {
-        throw HardwareInterfaceException("Cannot create handle for tensions");
-      }*/
 
     }
 
-    std::string getName() const {return "";}
-    std::vector<std::string> getNames() const {return names_;}
-    std::vector<double> getDesiredPressures() const {return desired_pressures_;}
-    std::vector<double> getCurrentPressures() const {return current_pressures_;}
-    std::vector<double> getTensions() const {return tensions_;}
+    std::string getName() const { return name_; }
 
+    double getDesiredPressure() const {assert(desired_pressure_); return *desired_pressure_; }
+    void setDesiredPressure(double desired_pressure) {assert(desired_pressure_); *desired_pressure_ = desired_pressure; }
+
+    double getCurrentPressure() const {assert(current_pressure_); return *current_pressure_; }
+    void setCurrentPressure(double current_pressure) {assert(current_pressure_); *current_pressure_ = current_pressure; }
+
+    double getTension() const {assert(tension_); return *tension_; }
+    void setTension(double tension) {assert(tension_); *tension_ = tension; }
 
 
   private:
-    std::vector<std::string> names_;
-    std::vector<double> desired_pressures_;
-    std::vector<double> current_pressures_;
-    std::vector<double> tensions_;
-
+    std::string name_;
+    double* desired_pressure_;
+    double* current_pressure_;
+    double* tension_;
 
   };
 
-  class MuscleInterface : public hardware_interface::HardwareResourceManager<MuscleHandle> {
-  public:
-    std::string getName() const {return "";}
 
+  class MuscleInterface : public hardware_interface::HardwareResourceManager<MuscleHandle> {
   };
 
 }
