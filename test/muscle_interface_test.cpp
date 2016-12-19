@@ -88,13 +88,35 @@ TEST_F(MuscleInterfaceTest, ExcerciseApi) {
 // This interface does not claim resources
   EXPECT_TRUE(iface.getClaims().empty());
 
-// Print error message
-// Requires manual output inspection, but exception message should contain the interface name (not its base class)
-  try {
-    iface.getHandle("unknown_name");
-  }
+  EXPECT_THROW(iface.getHandle("unknown_name"), hardware_interface::HardwareInterfaceException);
 
-  catch (const hardware_interface::HardwareInterfaceException &e) { ROS_ERROR_STREAM(e.what()); }
+}
+
+TEST_F(MuscleInterfaceTest, setterGetter) {
+  MuscleInterface iface;
+
+  double d=0, c=0, t=0, a=0;
+  std::string n = "nnnn";
+  MuscleHandle mh(n, &d, &c, &t, &a);
+  iface.registerHandle(mh);
+
+
+  EXPECT_DOUBLE_EQ(0, mh.getDesiredPressure());
+  EXPECT_DOUBLE_EQ(0, mh.getCurrentPressure());
+  EXPECT_DOUBLE_EQ(0, mh.getTension());
+  EXPECT_DOUBLE_EQ(0, mh.getActivation());
+
+
+  mh.setDesiredPressure(999.9);
+  mh.setCurrentPressure(999.9);
+  mh.setTension(999.9);
+  mh.setActivation(999.9);
+
+  EXPECT_DOUBLE_EQ(999.9, mh.getDesiredPressure());
+  EXPECT_DOUBLE_EQ(999.9, mh.getCurrentPressure());
+  EXPECT_DOUBLE_EQ(999.9, mh.getTension());
+  EXPECT_DOUBLE_EQ(999.9, mh.getActivation());
+
 }
 
 int main(int argc, char **argv) {
