@@ -27,8 +27,8 @@ namespace arl_interfaces {
      * @param tension sets an initial tension
      * @return
      */
-    MuscleHandle(const std::string &name, double* desired_pressure, double* current_pressure, double* tension, double* activation)
-      : name_(name), desired_pressure_(desired_pressure), current_pressure_(current_pressure), tension_(tension), activation_(activation) {
+    MuscleHandle(const std::string &name, double* desired_pressure, double* current_pressure, double* tension, double* activation, double* tension_filtered, uint8_t* control_mode)
+      : name_(name), desired_pressure_(desired_pressure), current_pressure_(current_pressure), tension_(tension), activation_(activation), tension_filtered_(tension_filtered), control_mode_(control_mode) {
 
       if (!desired_pressure)
       {
@@ -42,9 +42,17 @@ namespace arl_interfaces {
       {
         throw hardware_interface::HardwareInterfaceException("Cannot create handle for tension of muscle " + name);
       }
-      if (!activation_)
+      if (!activation)
       {
         throw hardware_interface::HardwareInterfaceException("Cannot create handle for activation of muscle " + name);
+      }
+      if (!tension_filtered)
+      {
+        throw hardware_interface::HardwareInterfaceException("Cannot create handle for filtered tension of muscle " + name);
+      }
+      if (!control_mode)
+      {
+        throw hardware_interface::HardwareInterfaceException("Cannot create handle for the control mode of muscle " + name);
       }
 
     }
@@ -103,6 +111,14 @@ namespace arl_interfaces {
      */
     void setActivation(double activation) {assert(activation_); *activation_ = activation; }
 
+    double getTensionFiltered() const {assert(tension_filtered_); return *tension_filtered_; }
+
+    void setTensionFiltered(double tension_filtered) {assert(tension_filtered_); *tension_filtered_ = tension_filtered; }
+
+    uint8_t getControlMode() const {assert(control_mode_); return *control_mode_; }
+
+    void setControlMode(double control_mode) {assert(control_mode_); *control_mode_ = control_mode; }
+
 
   private:
     std::string name_; /**< Saves muscle's name */
@@ -110,6 +126,8 @@ namespace arl_interfaces {
     double* current_pressure_; /**< Saves pointer to muscle's current pressure stored within the robot hardware interface */
     double* tension_; /**< Saves pointer to muscle's tension stored within the robot hardware interface */
     double* activation_; /**< Saves pointer to muscle's normalized muscle activation stored within the robot hardware interface */
+    double* tension_filtered_;
+    uint8_t* control_mode_;
 
   };
 
